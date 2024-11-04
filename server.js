@@ -5,13 +5,19 @@ const app = express();
 require('dotenv').config();  // To use environment variables
 
 // Connect to MongoDB
-console.log('Database URL:', process.env.DATABASE_URL);
-mongoose.connect(process.env.DATABASE_URL);
+async function connectToDatabase() {
+  try {
+    await mongoose.connect(process.env.DATABASE_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+  }
+}
 
-const db = mongoose.connection;
-db.on('error', (error) => console.error('MongoDB connection error:', error));
-db.once('open', () => console.log('Connected to MongoDB'));
-
+connectToDatabase(); // Initiate the MongoDB connection
 
 // Middleware to parse incoming request bodies
 app.use(express.urlencoded({ extended: true }));
@@ -24,20 +30,21 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Quotes App!');
 });
 
+// Import the Quote model
 const Quote = require('./models/quotes');
 
-//Route to show a form for adding a new quote
+// Route to show a form for adding a new quote
 app.get('/quotes/new', (req, res) => {
-  res.render('new'); //Render the new view for the form
+  res.render('new'); // Render the 'new' view for the form
 });
 
-//POST route to add a new quote to the database
+// POST route to add a new quote to the database
 app.post('/quotes', async (req, res) => {
   try {
     // Create a new quote from form data
     const newQuote = new Quote({
       text: req.body.text,
-      author: req.body.author || 'Anonymous'
+      author: req.body.author || 'Anonymous',
     });
     await newQuote.save(); // Save the new quote to the database
     res.redirect('/quotes'); // Redirect to the list of quotes (we’ll set up this route later)
@@ -46,13 +53,13 @@ app.post('/quotes', async (req, res) => {
   }
 });
 
-//GET route to display all quotes
+// GET route to display all quotes
 app.get('/quotes', async (req, res) => {
   try {
-    const quotes = await Quote.find() // Find all quotes in database
+    const quotes = await Quote.find(); // Find all quotes in database
     res.render('index', { quotes });
-  } catch (errer) {
-    res.status(500).send('Error fetching quotes: ' + errer.message);
+  } catch (error) { // Fix typo here (was "errer" in your code)
+    res.status(500).send('Error fetching quotes: ' + error.message);
   }
 });
 
