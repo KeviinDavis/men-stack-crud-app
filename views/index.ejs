@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Quotes</title>
+</head>
+<body>
+  <h1>Quotes</h1>
+  <a href="/quotes/new">Add a New Quote</a>
+
+  <ul>
+    <% quotes.forEach(quote => { %>
+      <li>
+        <strong><%= quote.text %></strong> - <%= quote.author %>
+      </li>
+    <% }) %>
+  </ul>
+</body>
+</html>
