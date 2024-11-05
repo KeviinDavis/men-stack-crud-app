@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const app = express();
 require('dotenv').config();  // To use environment variables
 
+const methodOverride = require('method-override');
+
 // Connect to MongoDB
 async function connectToDatabase() {
   try {
@@ -21,6 +23,7 @@ connectToDatabase(); // Initiate the MongoDB connection
 
 // Middleware to parse incoming request bodies
 app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
 
 // Set EJS as our view engine
 app.set('view engine', 'ejs');
@@ -47,7 +50,7 @@ app.post('/quotes', async (req, res) => {
       author: req.body.author || 'Anonymous',
     });
     await newQuote.save(); // Save the new quote to the database
-    res.redirect('/quotes'); // Redirect to the list of quotes (we’ll set up this route later)
+    res.redirect('/quotes'); // Redirect to the list of quotes
   } catch (error) {
     res.status(400).send('Error saving quote: ' + error.message);
   }
@@ -58,8 +61,41 @@ app.get('/quotes', async (req, res) => {
   try {
     const quotes = await Quote.find(); // Find all quotes in database
     res.render('index', { quotes });
-  } catch (error) { // Fix typo here (was "errer" in your code)
+  } catch (error) {
     res.status(500).send('Error fetching quotes: ' + error.message);
+  }
+});
+
+// PUT route to update a specific quote
+app.put('/quotes/:id', async (req, res) => {
+  try {
+    await Quote.findByIdAndUpdate(req.params.id, {
+      text: req.body.text,
+      author: req.body.author,
+    });
+    res.redirect('/quotes'); // Redirect to the quotes list after updating
+  } catch (error) {
+    res.status(400).send('Error updating quote: ' + error.message);
+  }
+});
+
+// GET route to show the edit form for a specific quote
+app.get('/quotes/:id/edit', async (req, res) => {
+  try {
+    const quote = await Quote.findById(req.params.id);
+    res.render('edit', { quote });
+  } catch (error) {
+    res.status(404).send('Quote not found');
+  }
+});
+
+// DELETE route to remove a specific quote
+app.delete('/quotes/:id', async (req, res) => {
+  try {
+    await Quote.findByIdAndDelete(req.params.id); // Delete quote by ID
+    res.redirect('/quotes'); // Redirect to the list of quotes
+  } catch (error) {
+    res.status(500).send('Error deleting quote: ' + error.message);
   }
 });
 

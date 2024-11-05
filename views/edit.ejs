@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Quote</title>
+</head>
+<body>
+  <h1>Edit Quote</h1>
+  <form action="/quotes/<%= quote._id %>?_method=PUT" method="POST">
+    <label for="text">Quote:</label>
+    <input type="text" id="text" name="text" value="<%= quote.text %>" required>
+
+    <label for="author">Author:</label>
+    <input type="text" id="author" name="author" value="<%= quote.author %>">
+
+    <button type="submit">Update Quote</button>
+  </form>
+</body>
+</html>

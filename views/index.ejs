@@ -13,6 +13,11 @@
     <% quotes.forEach(quote => { %>
       <li>
         <strong><%= quote.text %></strong> - <%= quote.author %>
+        <a href="/quotes/<%= quote._id %>/edit">Edit</a>
+
+        <form action="/quotes/<%= quote._id %>?_method=DELETE" method="POST" style="display:inline;">
+          <button type="submit">Delete</button>
+        </form>
       </li>
     <% }) %>
   </ul>
